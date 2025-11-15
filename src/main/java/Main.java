@@ -19,7 +19,7 @@
                         System.out.println(arguments + ": not found");
                     }
                 } else {
-                    System.out.println(input.substring(5) + ": command not found");
+                    System.out.println(input + ": command not found");
                 }
             }
         }
