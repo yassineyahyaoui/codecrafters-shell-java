@@ -1,3 +1,4 @@
+    import java.util.Arrays;
     import java.util.Scanner;
 
     public class Main {
@@ -11,18 +12,11 @@
                     System.out.println(input.substring(5));
                 } else if (input.split(" ")[0].equals("type")) {
                     String arguments = input.substring(5);
-                    switch (arguments) {
-                        case "exit 0":
-                            System.out.println("exit is a shell builtin");
-                            break;
-                        case "echo":
-                            System.out.println("echo is a shell builtin");
-                            break;
-                        case "type":
-                            System.out.println("type is a shell builtin");
-                            break;
-                        default:
-                            System.out.println(arguments + ": command not found");
+                    String[] allowedArguments = {"exit", "echo", "type"};
+                    if (Arrays.asList(allowedArguments).contains(arguments)) {
+                        System.out.println(arguments + " is a shell builtin");
+                    } else {
+                        System.out.println(arguments + ": command not found");
                     }
                 } else {
                     System.out.println(input.substring(5) + ": command not found");
