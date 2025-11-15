@@ -16,7 +16,7 @@
                     if (Arrays.asList(allowedArguments).contains(arguments)) {
                         System.out.println(arguments + " is a shell builtin");
                     } else {
-                        System.out.println(arguments + ": command not found");
+                        System.out.println(arguments + ": not found");
                     }
                 } else {
                     System.out.println(input.substring(5) + ": command not found");
