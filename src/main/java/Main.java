@@ -2,13 +2,11 @@
 
     public class Main {
         public static void main(String[] args) throws Exception {
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("$ ");
-            System.out.flush();
-
-            String command = scanner.nextLine().trim();
-            if (!command.isEmpty()) {
-                System.out.println(command + ": command not found");
+            while (true) {
+                System.out.print("$ ");
+                Scanner scanner = new Scanner(System.in);
+                String input = scanner.nextLine();
+                System.out.println(input + ": command not found");
             }
         }
     }
