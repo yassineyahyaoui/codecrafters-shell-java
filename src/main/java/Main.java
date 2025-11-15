@@ -9,8 +9,23 @@
                 if (input.equals("exit 0")) break;
                 else if (input.split(" ")[0].equals("echo")) {
                     System.out.println(input.substring(5));
+                } else if (input.split(" ")[0].equals("type")) {
+                    String arguments = input.substring(5);
+                    switch (arguments) {
+                        case "exit 0":
+                            System.out.println("exit is a shell builtin");
+                            break;
+                        case "echo":
+                            System.out.println("echo is a shell builtin");
+                            break;
+                        case "type":
+                            System.out.println("type is a shell builtin");
+                            break;
+                        default:
+                            System.out.println(arguments + ": command not found");
+                    }
                 } else {
-                    System.out.println(input + ": command not found");
+                    System.out.println(input.substring(5) + ": command not found");
                 }
             }
         }
