@@ -19,20 +19,20 @@ public class Main {
 
                 if (Arrays.asList(allowedArguments).contains(arguments)) {
                     System.out.println(arguments + " is a shell builtin");
-                }
-
-                String[] paths = System.getenv("PATH").split(File.pathSeparator);
-                boolean found = false;
-                for (String path : paths) {
-                    File file = new File(path, arguments);
-                    if (file.exists() && file.canExecute()) {
-                        System.out.println(arguments + " is " + file.getAbsolutePath());
-                        found = true;
-                        break;
+                } else {
+                    String[] paths = System.getenv("PATH").split(File.pathSeparator);
+                    boolean found = false;
+                    for (String path : paths) {
+                        File file = new File(path, arguments);
+                        if (file.exists() && file.canExecute()) {
+                            System.out.println(arguments + " is " + file.getAbsolutePath());
+                            found = true;
+                            break;
+                        }
                     }
-                }
-                if (!found) {
-                    System.out.println(arguments + ": not found");
+                    if (!found) {
+                        System.out.println(arguments + ": not found");
+                    }
                 }
 
             } else {
