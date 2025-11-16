@@ -25,7 +25,7 @@ public class Main {
                 boolean found = false;
                 for (String path : paths) {
                     File file = new File(path, arguments);
-                    if (file.exists()) {
+                    if (file.exists() && file.canExecute()) {
                         System.out.println(arguments + " is " + file.getAbsolutePath());
                         found = true;
                         break;
