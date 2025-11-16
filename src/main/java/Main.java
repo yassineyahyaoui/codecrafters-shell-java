@@ -28,6 +28,7 @@ public class Main {
                     if (file.exists()) {
                         System.out.println(arguments + " is " + file.getAbsolutePath());
                         found = true;
+                        break;
                     }
                 }
                 if (!found) {
