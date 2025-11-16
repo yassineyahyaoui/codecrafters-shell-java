@@ -22,20 +22,21 @@ public class Main {
                 }
 
                 String[] paths = System.getenv("PATH").split(File.pathSeparator);
+                boolean found = false;
                 for (String path : paths) {
                     File file = new File(path, arguments);
                     if (file.exists()) {
                         System.out.println(arguments + " is " + file.getAbsolutePath());
+                        found = true;
                     }
                 }
-
-                System.out.println(arguments + ": not found");
+                if (!found) {
+                    System.out.println(arguments + ": not found");
+                }
 
             } else {
                 System.out.println(input + ": command not found");
             }
-
-            scanner.close();
         }
     }
 }
