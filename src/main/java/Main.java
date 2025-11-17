@@ -22,7 +22,7 @@ public class Main {
 
                 } else if (input.split(" ")[0].equals("type")) {
                     String arguments = input.substring(5);
-                    String[] allowedArguments = {"exit", "echo", "type"};
+                    String[] allowedArguments = {"exit", "echo", "type", "pwd"};
 
                     if (Arrays.asList(allowedArguments).contains(arguments)) {
                         System.out.println(arguments + " is a shell builtin");
