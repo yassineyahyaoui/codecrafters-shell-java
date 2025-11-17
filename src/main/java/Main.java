@@ -35,23 +35,24 @@ public class Main {
                     }
                 }
 
-            }
-            boolean found = false;
-            List<String> arguments = new ArrayList<>();
-            Collections.addAll(arguments, input.split(" "));
-            for (String path : paths) {
-                File file = new File(path, arguments.getFirst());
-                if (file.exists() && file.canExecute()) {
-                    found = true;
-                    ProcessBuilder pb = new ProcessBuilder(arguments);
-                    pb.redirectErrorStream(true);
-                    Process process = pb.start();
-                    process.getInputStream().transferTo(System.out);
-                    break;
+            } else {
+                boolean found = false;
+                List<String> arguments = new ArrayList<>();
+                Collections.addAll(arguments, input.split(" "));
+                for (String path : paths) {
+                    File file = new File(path, arguments.getFirst());
+                    if (file.exists() && file.canExecute()) {
+                        found = true;
+                        ProcessBuilder pb = new ProcessBuilder(arguments);
+                        pb.redirectErrorStream(true);
+                        Process process = pb.start();
+                        process.getInputStream().transferTo(System.out);
+                        break;
+                    }
                 }
-            }
-            if (!found) {
-                System.out.println(input + ": command not found");
+                if (!found) {
+                    System.out.println(input + ": command not found");
+                }
             }
         }
     }
