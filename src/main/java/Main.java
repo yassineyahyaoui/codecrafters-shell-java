@@ -1,6 +1,5 @@
 import java.io.File;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -8,8 +7,10 @@ public class Main {
             System.out.print("$ ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
+            String[] paths = System.getenv("PATH").split(File.pathSeparator);
 
             if (input.equals("exit 0")) break;
+
             else if (input.split(" ")[0].equals("echo")) {
                 System.out.println(input.substring(5));
 
@@ -20,7 +21,6 @@ public class Main {
                 if (Arrays.asList(allowedArguments).contains(arguments)) {
                     System.out.println(arguments + " is a shell builtin");
                 } else {
-                    String[] paths = System.getenv("PATH").split(File.pathSeparator);
                     boolean found = false;
                     for (String path : paths) {
                         File file = new File(path, arguments);
@@ -35,7 +35,22 @@ public class Main {
                     }
                 }
 
-            } else {
+            }
+            boolean found = false;
+            List<String> arguments = new ArrayList<>();
+            Collections.addAll(arguments, input.split(" "));
+            for (String path : paths) {
+                File file = new File(path, arguments.getFirst());
+                if (file.exists() && file.canExecute()) {
+                    found = true;
+                    ProcessBuilder pb = new ProcessBuilder(arguments);
+                    pb.redirectErrorStream(true);
+                    Process process = pb.start();
+                    process.getInputStream().transferTo(System.out);
+                    break;
+                }
+            }
+            if (!found) {
                 System.out.println(input + ": command not found");
             }
         }
