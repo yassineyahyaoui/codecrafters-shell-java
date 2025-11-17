@@ -1,4 +1,5 @@
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
@@ -11,6 +12,10 @@ public class Main {
                 String[] paths = System.getenv("PATH").split(File.pathSeparator);
 
                 if (input.equals("exit 0")) break;
+
+                else if (input.equals("pwd")) {
+                    System.out.println(Paths.get("").toAbsolutePath().toString());
+                }
 
                 else if (input.split(" ")[0].equals("echo")) {
                     System.out.println(input.substring(5));
