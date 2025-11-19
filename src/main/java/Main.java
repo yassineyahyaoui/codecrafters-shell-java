@@ -1,8 +1,11 @@
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
+    static Path path = Paths.get("").toAbsolutePath();
+
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         try {
@@ -14,12 +17,14 @@ public class Main {
                 if (isExitCommand(input)) {
                     break;
                 } else if (input.equals("pwd")) {
-                    handlePwd();
+                    System.out.println(path.toString());
                 } else if (input.split(" ")[0].equals("echo")) {
                     handleEcho(input);
                 } else if (input.split(" ")[0].equals("type")) {
                     String arguments = input.substring(5);
                     handleType(arguments, paths);
+                } else if (input.split(" ")[0].equals("cd")) {
+                    handleCd(input.substring(3));
                 } else {
                     handleExternalCommand(input, paths);
                 }
@@ -33,12 +38,17 @@ public class Main {
         return input.equals("exit 0");
     }
 
-    private static void handlePwd() {
-        System.out.println(Paths.get("").toAbsolutePath().toString());
-    }
-
     private static void handleEcho(String input) {
         System.out.println(input.substring(5));
+    }
+
+    private static void handleCd(String argument) {
+        Path p = Paths.get(argument);
+        if (!p.isAbsolute()) {
+            System.out.println("cd: " + argument + ": No such file or directory");
+        } else {
+            path = Paths.get(p.toString());
+        }
     }
 
     private static void handleType(String arguments, String[] paths) {
