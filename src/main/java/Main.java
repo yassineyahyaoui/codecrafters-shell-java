@@ -51,7 +51,7 @@ public class Main {
         if (!file.isDirectory()) {
             System.out.println("cd: " + argument + ": No such file or directory");
         } else {
-            path = p.toAbsolutePath().normalize();
+            path = p.normalize();
         }
     }
 
