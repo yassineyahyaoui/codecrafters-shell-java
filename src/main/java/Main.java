@@ -43,15 +43,23 @@ public class Main {
     }
 
     private static void handleCd(String argument) {
-        Path p = Paths.get(argument);
-        if (!p.isAbsolute()) {
-            p = path.resolve(argument);
-        }
-        File file = p.toFile();
-        if (!file.isDirectory()) {
-            System.out.println("cd: " + argument + ": No such file or directory");
+        if (argument.equals("~")) {
+            if (System.getenv("HOME") != null) {
+                path = Paths.get(System.getenv("HOME"));
+            } else {
+                path = Paths.get(System.getenv("USERPROFILE"));
+            }
         } else {
-            path = p.normalize();
+            Path p = Paths.get(argument);
+            if (!p.isAbsolute()) {
+                p = path.resolve(argument);
+            }
+            File file = p.toFile();
+            if (!file.isDirectory()) {
+                System.out.println("cd: " + argument + ": No such file or directory");
+            } else {
+                path = p.normalize();
+            }
         }
     }
 
