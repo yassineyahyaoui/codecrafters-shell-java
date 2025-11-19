@@ -45,9 +45,13 @@ public class Main {
     private static void handleCd(String argument) {
         Path p = Paths.get(argument);
         if (!p.isAbsolute()) {
+            p = path.resolve(argument);
+        }
+        File file = p.toFile();
+        if (!file.isDirectory()) {
             System.out.println("cd: " + argument + ": No such file or directory");
         } else {
-            path = Paths.get(p.toString());
+            path = p.toAbsolutePath().normalize();
         }
     }
 
