@@ -2,6 +2,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.*;
 
 public class Main {
     static Path path = Paths.get("").toAbsolutePath();
@@ -39,7 +40,19 @@ public class Main {
     }
 
     private static void handleEcho(String input) {
-        System.out.println(input.substring(5));
+        Matcher matcher = Pattern.compile("'([^']*)'|\\S+").matcher(input.substring(5));
+        StringBuilder res = new StringBuilder();
+
+        while (matcher.find()) {
+            String word = matcher.group();
+            if (word.charAt(0) == '\'' && word.charAt(word.length() - 1) == '\'') {
+                word = word.trim();
+            }
+            res.append(word);
+            res.append(" ");
+        }
+
+        System.out.println(res.toString().trim());
     }
 
     private static void handleCd(String argument) {
