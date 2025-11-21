@@ -56,7 +56,6 @@ public class Main {
 
             res.append(word);
             prevEnd = matcher.end();
-            System.out.println(prevEnd);
         }
 
         System.out.println(res.toString());
