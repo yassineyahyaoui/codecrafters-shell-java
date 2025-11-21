@@ -38,7 +38,7 @@ public class Main {
 
     private static void handleEcho(String input) {
         String s = input.substring(5);
-        System.out.println(handleArgumentParsing(s));
+        System.out.println(parseArguments(s));
     }
 
     private static void handleCd(String argument) {
@@ -85,9 +85,10 @@ public class Main {
 
     private static void handleExternalCommand(String input, String[] paths) throws Exception {
         boolean found = false;
-        List<String> arguments = new ArrayList<>();
-        input = handleArgumentParsing(input);
-        Collections.addAll(arguments, input.split(" "));
+        List<String> arguments = tokenizeArguments(input);
+        if (arguments.isEmpty()) {
+            return;
+        }
         for (String path : paths) {
             File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
@@ -100,11 +101,39 @@ public class Main {
             }
         }
         if (!found) {
-            System.out.println(input + ": command not found");
+            System.out.println(arguments.getFirst() + ": command not found");
         }
     }
 
-    private static String handleArgumentParsing(String input) {
+    private static List<String> tokenizeArguments(String input) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean insideQuotes = false;
+        
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            
+            if (c == '\'') {
+                insideQuotes = !insideQuotes;
+                // Don't append the quote character itself
+            } else if (c == ' ' && !insideQuotes) {
+                if (currentToken.length() > 0) {
+                    tokens.add(currentToken.toString());
+                    currentToken = new StringBuilder();
+                }
+            } else {
+                currentToken.append(c);
+            }
+        }
+        
+        if (currentToken.length() > 0) {
+            tokens.add(currentToken.toString());
+        }
+        
+        return tokens;
+    }
+
+    private static String parseArguments(String input) {
         Matcher matcher = Pattern.compile("'([^']*)'|[^'\\s]+").matcher(input);
         StringBuilder res = new StringBuilder();
 
