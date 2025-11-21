@@ -38,27 +38,7 @@ public class Main {
 
     private static void handleEcho(String input) {
         String s = input.substring(5);
-        Matcher matcher = Pattern.compile("'([^']*)'|[^'\\s]+").matcher(s);
-        StringBuilder res = new StringBuilder();
-
-        int prevEnd = -1;
-        while (matcher.find()) {
-            String word = matcher.group();
-            if (word.startsWith("'") && word.endsWith("'")) {
-                word = word.substring(1, word.length() - 1);
-            }
-
-            if (!res.isEmpty()) {
-                if (matcher.start() > prevEnd) {
-                    res.append(" ");
-                }
-            }
-
-            res.append(word);
-            prevEnd = matcher.end();
-        }
-
-        System.out.println(res.toString());
+        System.out.println(handleArgumentParsing(s));
     }
 
     private static void handleCd(String argument) {
@@ -106,6 +86,7 @@ public class Main {
     private static void handleExternalCommand(String input, String[] paths) throws Exception {
         boolean found = false;
         List<String> arguments = new ArrayList<>();
+        input = handleArgumentParsing(input);
         Collections.addAll(arguments, input.split(" "));
         for (String path : paths) {
             File file = new File(path, arguments.getFirst());
@@ -121,5 +102,29 @@ public class Main {
         if (!found) {
             System.out.println(input + ": command not found");
         }
+    }
+
+    private static String handleArgumentParsing(String input) {
+        Matcher matcher = Pattern.compile("'([^']*)'|[^'\\s]+").matcher(input);
+        StringBuilder res = new StringBuilder();
+
+        int prevEnd = -1;
+        while (matcher.find()) {
+            String word = matcher.group();
+            if (word.startsWith("'") && word.endsWith("'")) {
+                word = word.substring(1, word.length() - 1);
+            }
+
+            if (!res.isEmpty()) {
+                if (matcher.start() > prevEnd) {
+                    res.append(" ");
+                }
+            }
+
+            res.append(word);
+            prevEnd = matcher.end();
+        }
+
+        return res.toString();
     }
 }
