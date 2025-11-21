@@ -8,8 +8,7 @@ public class Main {
     static Path path = Paths.get("").toAbsolutePath();
 
     public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-        try {
+        try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
                 System.out.print("$ ");
                 String input = scanner.nextLine();
@@ -30,8 +29,6 @@ public class Main {
                     handleExternalCommand(input, paths);
                 }
             }
-        } finally {
-            scanner.close();
         }
     }
 
@@ -40,19 +37,29 @@ public class Main {
     }
 
     private static void handleEcho(String input) {
-        Matcher matcher = Pattern.compile("'([^']*)'|\\S+").matcher(input.substring(5));
+        String s = input.substring(5);
+        Matcher matcher = Pattern.compile("'([^']*)'|[^'\\s]+").matcher(s);
         StringBuilder res = new StringBuilder();
 
+        int prevEnd = -1;
         while (matcher.find()) {
             String word = matcher.group();
-            if (word.charAt(0) == '\'' && word.charAt(word.length() - 1) == '\'') {
+            if (word.startsWith("'") && word.endsWith("'")) {
                 word = word.substring(1, word.length() - 1);
             }
+
+            if (!res.isEmpty()) {
+                if (matcher.start() > prevEnd) {
+                    res.append(" ");
+                }
+            }
+
             res.append(word);
-            res.append(" ");
+            prevEnd = matcher.end();
+            System.out.println(prevEnd);
         }
 
-        System.out.println(res.toString().trim());
+        System.out.println(res.toString());
     }
 
     private static void handleCd(String argument) {
