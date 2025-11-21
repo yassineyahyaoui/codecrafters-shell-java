@@ -46,7 +46,7 @@ public class Main {
         while (matcher.find()) {
             String word = matcher.group();
             if (word.charAt(0) == '\'' && word.charAt(word.length() - 1) == '\'') {
-                word = word.trim();
+                word = word.substring(1, word.length() - 1);
             }
             res.append(word);
             res.append(" ");
