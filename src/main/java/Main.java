@@ -115,6 +115,8 @@ public class Main {
             if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
                 word = word.substring(1, word.length() - 1);
             }
+
+            word = word.replaceAll("\\\\(.)", "$1");
             
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
