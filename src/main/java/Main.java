@@ -38,7 +38,8 @@ public class Main {
 
     private static void handleEcho(String input) {
         String s = input.substring(5);
-        System.out.println(parseArguments(s));
+        List<String> args = parseArgumentsList(s);
+        System.out.println(String.join(" ", args));
     }
 
     private static void handleCd(String argument) {
@@ -85,9 +86,7 @@ public class Main {
 
     private static void handleExternalCommand(String input, String[] paths) throws Exception {
         boolean found = false;
-        List<String> arguments = new ArrayList<>();
-        input = parseArguments(input);
-        Collections.addAll(arguments, input.split(" "));
+        List<String> arguments = parseArgumentsList(input);
         for (String path : paths) {
             File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
@@ -100,31 +99,40 @@ public class Main {
             }
         }
         if (!found) {
-            System.out.println(input + ": command not found");
+            System.out.println(input.split(" ")[0] + ": command not found");
         }
     }
 
-    private static String parseArguments(String input) {
+    private static List<String> parseArgumentsList(String input) {
+        List<String> arguments = new ArrayList<>();
         Matcher matcher = Pattern.compile("'([^']*)'|[^'\\s]+").matcher(input);
-        StringBuilder res = new StringBuilder();
-
+        
+        StringBuilder currentArg = new StringBuilder();
         int prevEnd = -1;
+        
         while (matcher.find()) {
             String word = matcher.group();
             if (word.startsWith("'") && word.endsWith("'")) {
                 word = word.substring(1, word.length() - 1);
             }
-
-            if (!res.isEmpty()) {
-                if (matcher.start() > prevEnd) {
-                    res.append(" ");
+            
+            // If there's space between tokens, start a new argument
+            if (matcher.start() > prevEnd && prevEnd != -1) {
+                if (currentArg.length() > 0) {
+                    arguments.add(currentArg.toString());
+                    currentArg = new StringBuilder();
                 }
             }
-
-            res.append(word);
+            
+            currentArg.append(word);
             prevEnd = matcher.end();
         }
-
-        return res.toString();
+        
+        // Add the last argument if any
+        if (currentArg.length() > 0) {
+            arguments.add(currentArg.toString());
+        }
+        
+        return arguments;
     }
 }
