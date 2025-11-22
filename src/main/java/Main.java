@@ -33,7 +33,7 @@ public class Main {
     }
 
     private static boolean isExitCommand(String input) {
-        return input.equals("exit 0");
+        return input.equals("exit 0") || input.equals("exit");
     }
 
     private static void handleEcho(String input) {
