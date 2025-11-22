@@ -105,7 +105,7 @@ public class Main {
 
     private static List<String> parseArgumentsList(String input) {
         List<String> arguments = new ArrayList<>();
-        Matcher matcher = Pattern.compile("\"([^\"]*)\"|'([^']*)'|[^\\s\"']+").matcher(input);
+        Matcher matcher = Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"|'([^']*)'|(?:\\\\.|[^\\s\"'])+").matcher(input);
         
         StringBuilder currentArg = new StringBuilder();
         int prevEnd = -1;
