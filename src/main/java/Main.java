@@ -112,7 +112,7 @@ public class Main {
         
         while (matcher.find()) {
             String word = matcher.group();
-            if (word.startsWith("'") && word.endsWith("'")) {
+            if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
                 word = word.substring(1, word.length() - 1);
             }
             
