@@ -120,7 +120,7 @@ public class Main {
             
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
-                if (currentArg.length() > 0) {
+                if (!currentArg.isEmpty()) {
                     arguments.add(currentArg.toString());
                     currentArg = new StringBuilder();
                 }
@@ -131,7 +131,7 @@ public class Main {
         }
         
         // Add the last argument if any
-        if (currentArg.length() > 0) {
+        if (!currentArg.isEmpty()) {
             arguments.add(currentArg.toString());
         }
         
