@@ -116,8 +116,12 @@ public class Main {
                 word = word.substring(1, word.length() - 1);
             }
 
-            // Only process backslash escapes outside quotes (not in single quotes AND not in double quotes)
-            if (matcher.group(1) == null && matcher.group(2) == null) {
+            // Inside double quotes: only process \\ and \"
+            if (matcher.group(1) != null) {
+                word = word.replace("\\\"", "\"").replace("\\\\", "\\");
+            }
+            // Outside quotes: process all backslash escapes
+            else if (matcher.group(2) == null) {
                 word = word.replaceAll("\\\\(.)", "$1");
             }
             
