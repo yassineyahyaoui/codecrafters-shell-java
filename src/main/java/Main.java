@@ -23,7 +23,7 @@ public class Main {
                         if (input.contains("1>")) {
                             redirectionPosition = arguments.indexOf("1>");
                         }
-                        String result = String.join(" ", arguments.subList(1, redirectionPosition));
+                        String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)));
                         if (redirectionPosition < arguments.size() - 1) {
                             Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), result);
                         }
