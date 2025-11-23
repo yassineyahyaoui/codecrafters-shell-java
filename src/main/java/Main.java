@@ -111,12 +111,23 @@ public class Main {
         int prevEnd = -1;
         
         while (matcher.find()) {
-            String word = matcher.group();
-            if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
-                word = word.substring(1, word.length() - 1);
+            String word;
+            
+            // Check if it's double-quoted (group 1)
+            if (matcher.group(1) != null) {
+                // Inside double quotes: only \", \\, \$, \` are special
+                word = matcher.group(1).replaceAll("\\\\([\"\\\\\\'`$])", "$1");
             }
-
-            word = word.replaceAll("\\\\(.)", "$1");
+            // Check if it's single-quoted (group 2)
+            else if (matcher.group(2) != null) {
+                // Inside single quotes: no escaping at all
+                word = matcher.group(2);
+            }
+            // Otherwise it's unquoted
+            else {
+                // Outside quotes: backslash escapes any character
+                word = matcher.group().replaceAll("\\\\(.)", "$1");
+            }
             
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
