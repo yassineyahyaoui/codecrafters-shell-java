@@ -113,19 +113,14 @@ public class Main {
         while (matcher.find()) {
             String word;
             
-            // Check if it's double-quoted (group 1)
             if (matcher.group(1) != null) {
                 // Inside double quotes: only \", \\, \$, \` are special
                 word = matcher.group(1).replaceAll("\\\\([\"\\\\\\'`$])", "$1");
             }
-            // Check if it's single-quoted (group 2)
             else if (matcher.group(2) != null) {
-                // Inside single quotes: no escaping at all
                 word = matcher.group(2);
             }
-            // Otherwise it's unquoted
             else {
-                // Outside quotes: backslash escapes any character
                 word = matcher.group().replaceAll("\\\\(.)", "$1");
             }
             
