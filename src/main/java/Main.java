@@ -111,18 +111,12 @@ public class Main {
         int prevEnd = -1;
         
         while (matcher.find()) {
-            String word;
-            
-            if (matcher.group(1) != null) {
-                // Inside double quotes: only \", \\, \$, \` are special
-                word = matcher.group(1).replaceAll("\\\\([\"\\\\\\'`$])", "$1");
+            String word = matcher.group();
+            if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
+                word = word.substring(1, word.length() - 1);
             }
-            else if (matcher.group(2) != null) {
-                word = matcher.group(2);
-            }
-            else {
-                word = matcher.group().replaceAll("\\\\(.)", "$1");
-            }
+
+            word = word.replaceAll("\\\\(.)", "$1");
             
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
