@@ -116,7 +116,10 @@ public class Main {
                 word = word.substring(1, word.length() - 1);
             }
 
-            word = word.replaceAll("\\\\(.)", "$1");
+            // Only process backslash escapes outside quotes (not in single quotes AND not in double quotes)
+            if (matcher.group(1) == null && matcher.group(2) == null) {
+                word = word.replaceAll("\\\\(.)", "$1");
+            }
             
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
