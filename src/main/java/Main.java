@@ -1,4 +1,5 @@
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -12,23 +13,53 @@ public class Main {
             while (true) {
                 System.out.print("$ ");
                 String input = scanner.nextLine();
-                String[] paths = System.getenv("PATH").split(File.pathSeparator);
 
                 if (isExitCommand(input)) {
                     break;
-                } else if (input.equals("pwd")) {
-                    System.out.println(path.toString());
-                } else if (input.split(" ")[0].equals("echo")) {
-                    handleEcho(input);
-                } else if (input.split(" ")[0].equals("type")) {
-                    String arguments = input.substring(5);
-                    handleType(arguments, paths);
-                } else if (input.split(" ")[0].equals("cd")) {
-                    handleCd(input.substring(3));
                 } else {
-                    handleExternalCommand(input, paths);
+                    if (input.contains(">")) {
+                        List<String> arguments = parseArgumentsList(input);
+                        int redirectionPosition = arguments.indexOf(">");
+                        if (input.contains("1>")) {
+                            redirectionPosition = arguments.indexOf("1>");
+                        }
+                        String result = String.join(" ", arguments.subList(1, redirectionPosition));
+                        if (redirectionPosition < arguments.size() - 1) {
+                            Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), result);
+                        }
+
+
+                    } else {
+                        if (!handleCommand(input).isEmpty()) {
+                            if (handleCommand(input).endsWith("\n")) {
+                                System.out.print(handleCommand(input));
+                            }
+                            else {
+                                System.out.println(handleCommand(input));
+                            }
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    private static String handleCommand(String input) throws Exception {
+        String[] paths = System.getenv("PATH").split(File.pathSeparator);
+        if (input.equals("pwd")) {
+            return path.toString();
+        } else if (input.split(" ")[0].equals("echo")) {
+            return handleEcho(input);
+        } else if (input.split(" ")[0].equals("type")) {
+            return handleType(input.substring(5), paths);
+        } else if (input.split(" ")[0].equals("cd")) {
+            if (!handleCd(input.substring(3))) {
+                return "cd: " + input.substring(3) + ": No such file or directory";
+            } else {
+                return "";
+            }
+        } else {
+            return handleExternalCommand(input, paths);
         }
     }
 
@@ -36,19 +67,21 @@ public class Main {
         return input.equals("exit 0") || input.equals("exit");
     }
 
-    private static void handleEcho(String input) {
+    private static String handleEcho(String input) {
         String s = input.substring(5);
         List<String> args = parseArgumentsList(s);
-        System.out.println(String.join(" ", args));
+        return String.join(" ", args);
     }
 
-    private static void handleCd(String argument) {
+    // returns if the cd worked or not
+    private static boolean handleCd(String argument) {
         if (argument.equals("~")) {
             if (System.getenv("HOME") != null) {
                 path = Paths.get(System.getenv("HOME"));
             } else {
                 path = Paths.get(System.getenv("USERPROFILE"));
             }
+            return true;
         } else {
             Path p = Paths.get(argument);
             if (!p.isAbsolute()) {
@@ -56,60 +89,51 @@ public class Main {
             }
             File file = p.toFile();
             if (!file.isDirectory()) {
-                System.out.println("cd: " + argument + ": No such file or directory");
+                return false;
             } else {
                 path = p.normalize();
+                return true;
             }
         }
     }
 
-    private static void handleType(String arguments, String[] paths) {
+    private static String handleType(String arguments, String[] paths) {
         String[] allowedArguments = {"exit", "echo", "type", "pwd"};
 
         if (Arrays.asList(allowedArguments).contains(arguments)) {
-            System.out.println(arguments + " is a shell builtin");
+            return arguments + " is a shell builtin";
         } else {
-            boolean found = false;
             for (String path : paths) {
                 File file = new File(path, arguments);
                 if (file.exists() && file.canExecute()) {
-                    System.out.println(arguments + " is " + file.getAbsolutePath());
-                    found = true;
-                    break;
+                    return arguments + " is " + file.getAbsolutePath();
                 }
             }
-            if (!found) {
-                System.out.println(arguments + ": not found");
-            }
+            return arguments + ": not found";
         }
     }
 
-    private static void handleExternalCommand(String input, String[] paths) throws Exception {
-        boolean found = false;
+    private static String handleExternalCommand(String input, String[] paths) throws Exception {
         List<String> arguments = parseArgumentsList(input);
         for (String path : paths) {
             File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
-                found = true;
                 ProcessBuilder pb = new ProcessBuilder(arguments);
                 pb.redirectErrorStream(true);
                 Process process = pb.start();
-                process.getInputStream().transferTo(System.out);
-                break;
+                return new String(process.getInputStream().readAllBytes());
             }
         }
-        if (!found) {
-            System.out.println(input.split(" ")[0] + ": command not found");
-        }
+        return input.split(" ")[0] + ": command not found";
     }
 
     private static List<String> parseArgumentsList(String input) {
         List<String> arguments = new ArrayList<>();
         Matcher matcher = Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"|'([^']*)'|(?:\\\\.|[^\\s\"'])+").matcher(input);
-        
+
         StringBuilder currentArg = new StringBuilder();
         int prevEnd = -1;
-        
+
         while (matcher.find()) {
             String word = matcher.group();
             if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
@@ -124,7 +148,7 @@ public class Main {
             else if (matcher.group(2) == null) {
                 word = word.replaceAll("\\\\(.)", "$1");
             }
-            
+
             // If there's space between tokens, start a new argument
             if (matcher.start() > prevEnd && prevEnd != -1) {
                 if (!currentArg.isEmpty()) {
@@ -132,16 +156,16 @@ public class Main {
                     currentArg = new StringBuilder();
                 }
             }
-            
+
             currentArg.append(word);
             prevEnd = matcher.end();
         }
-        
+
         // Add the last argument if any
         if (!currentArg.isEmpty()) {
             arguments.add(currentArg.toString());
         }
-        
+
         return arguments;
     }
 }
