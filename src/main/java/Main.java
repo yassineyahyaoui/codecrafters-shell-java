@@ -119,9 +119,17 @@ public class Main {
             File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
                 ProcessBuilder pb = new ProcessBuilder(arguments);
-                pb.redirectErrorStream(true);
                 Process process = pb.start();
-                return new String(process.getInputStream().readAllBytes());
+                
+                String stdout = new String(process.getInputStream().readAllBytes());
+                
+                String stderr = new String(process.getErrorStream().readAllBytes());
+                
+                if (!stderr.isEmpty()) {
+                    System.out.print(stderr);
+                }
+                
+                return stdout;
             }
         }
         return input.split(" ")[0] + ": command not found";
