@@ -2,6 +2,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.regex.*;
 
@@ -21,19 +22,30 @@ public class Main {
                     if (input.contains(">")) {
                         List<String> arguments = parseArgumentsList(input);
                         int redirectionPosition = arguments.indexOf(">");
-                        if (input.contains("1>")) {
-                            redirectionPosition = arguments.indexOf("1>");
-                        }
-                        if (input.contains("2>")) {
-                            redirectionPosition = arguments.indexOf("2>");
-                            isStderr = true;
+                        String[] operators = {"1>>", "2>>", ">>", "1>", "2>"};
+                        for (String op : operators) {
+                            if (input.contains(op)) {
+                                redirectionPosition = arguments.indexOf(op);
+                                isStderr = op.startsWith("2");
+                                break;
+                            }
                         }
                         String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)), isStderr);
                         if (redirectionPosition < arguments.size() - 1) {
+                            Path outputPath = Paths.get(arguments.get(redirectionPosition + 1));
+                            
                             if (isStderr && (arguments.getFirst().equals("echo") || arguments.getFirst().equals("type") || arguments.getFirst().equals("cd"))) {
-                                Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), "");
+                                Files.writeString(outputPath, "");
                             } else {
-                                Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), result);
+                                if (input.contains(">>")) {
+                                    if (Files.exists(outputPath)) {
+                                    Files.writeString(outputPath, "\n" + result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                                    } else {
+                                        Files.writeString(outputPath, result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                                    }
+                                } else {
+                                    Files.writeString(outputPath, result);
+                                }
                             }
                         }
 
