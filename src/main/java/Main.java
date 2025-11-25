@@ -17,25 +17,33 @@ public class Main {
                 if (isExitCommand(input)) {
                     break;
                 } else {
+                    boolean isStderr = false;
                     if (input.contains(">")) {
                         List<String> arguments = parseArgumentsList(input);
                         int redirectionPosition = arguments.indexOf(">");
                         if (input.contains("1>")) {
                             redirectionPosition = arguments.indexOf("1>");
                         }
-                        String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)));
+                        if (input.contains("2>")) {
+                            redirectionPosition = arguments.indexOf("2>");
+                            isStderr = true;
+                        }
+                        String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)), isStderr);
                         if (redirectionPosition < arguments.size() - 1) {
-                            Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), result);
+                            if (isStderr && (arguments.getFirst().equals("echo") || arguments.getFirst().equals("type") || arguments.getFirst().equals("cd"))) {
+                                Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), "");
+                            } else {
+                                Files.writeString(Paths.get(arguments.get(redirectionPosition + 1)), result);
+                            }
                         }
 
-
                     } else {
-                        if (!handleCommand(input).isEmpty()) {
-                            if (handleCommand(input).endsWith("\n")) {
-                                System.out.print(handleCommand(input));
+                        if (!handleCommand(input, isStderr).isEmpty()) {
+                            if (handleCommand(input, isStderr).endsWith("\n")) {
+                                System.out.print(handleCommand(input, isStderr));
                             }
                             else {
-                                System.out.println(handleCommand(input));
+                                System.out.println(handleCommand(input, isStderr));
                             }
                         }
                     }
@@ -44,12 +52,12 @@ public class Main {
         }
     }
 
-    private static String handleCommand(String input) throws Exception {
+    private static String handleCommand(String input, boolean isStderr) throws Exception {
         String[] paths = System.getenv("PATH").split(File.pathSeparator);
         if (input.equals("pwd")) {
             return path.toString();
         } else if (input.split(" ")[0].equals("echo")) {
-            return handleEcho(input);
+            return handleEcho(input, isStderr);
         } else if (input.split(" ")[0].equals("type")) {
             return handleType(input.substring(5), paths);
         } else if (input.split(" ")[0].equals("cd")) {
@@ -59,7 +67,7 @@ public class Main {
                 return "";
             }
         } else {
-            return handleExternalCommand(input, paths);
+            return handleExternalCommand(input, paths, isStderr);
         }
     }
 
@@ -67,9 +75,12 @@ public class Main {
         return input.equals("exit 0") || input.equals("exit");
     }
 
-    private static String handleEcho(String input) {
+    private static String handleEcho(String input, boolean isStderr) {
         String s = input.substring(5);
         List<String> args = parseArgumentsList(s);
+        if (isStderr) {
+            System.out.println(String.join(" ", args));
+        }
         return String.join(" ", args);
     }
 
@@ -113,23 +124,29 @@ public class Main {
         }
     }
 
-    private static String handleExternalCommand(String input, String[] paths) throws Exception {
+    private static String handleExternalCommand(String input, String[] paths, boolean isStderr) throws Exception {
         List<String> arguments = parseArgumentsList(input);
         for (String path : paths) {
             File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
                 ProcessBuilder pb = new ProcessBuilder(arguments);
                 Process process = pb.start();
-                
+
                 String stdout = new String(process.getInputStream().readAllBytes());
-                
+
                 String stderr = new String(process.getErrorStream().readAllBytes());
-                
-                if (!stderr.isEmpty()) {
-                    System.out.print(stderr);
+
+                if (!isStderr) {
+                    if (!stderr.isEmpty()) {
+                        System.out.print(stderr);
+                    }
+                    return stdout;
+                } else {
+                    if (!stdout.isEmpty()) {
+                        System.out.print(stdout);
+                    }
+                    return stderr;
                 }
-                
-                return stdout;
             }
         }
         return input.split(" ")[0] + ": command not found";
