@@ -34,12 +34,16 @@ public class Main {
                         if (redirectionPosition < arguments.size() - 1) {
                             Path outputPath = Paths.get(arguments.get(redirectionPosition + 1));
                             
+                            if (result.endsWith("\n")) {
+                                result = result.substring(0, result.length() - 1);
+                            }
+                            
                             if (isStderr && (arguments.getFirst().equals("echo") || arguments.getFirst().equals("type") || arguments.getFirst().equals("cd"))) {
                                 Files.writeString(outputPath, "");
                             } else {
                                 if (input.contains(">>")) {
-                                    if (Files.exists(outputPath)) {
-                                    Files.writeString(outputPath, "\n" + result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                                    if (Files.exists(outputPath) && Files.size(outputPath) > 0) {
+                                        Files.writeString(outputPath, "\n" + result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                                     } else {
                                         Files.writeString(outputPath, result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                                     }
