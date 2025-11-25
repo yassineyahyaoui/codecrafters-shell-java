@@ -18,51 +18,53 @@ public class Main {
                 if (isExitCommand(input)) {
                     break;
                 } else {
-                    boolean isStderr = false;
-                    if (input.contains(">")) {
-                        List<String> arguments = parseArgumentsList(input);
-                        int redirectionPosition = arguments.indexOf(">");
-                        String[] operators = {"1>>", "2>>", ">>", "1>", "2>"};
-                        for (String op : operators) {
-                            if (input.contains(op)) {
-                                redirectionPosition = arguments.indexOf(op);
-                                isStderr = op.startsWith("2");
-                                break;
-                            }
-                        }
-                        String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)), isStderr);
-                        if (redirectionPosition < arguments.size() - 1) {
-                            Path outputPath = Paths.get(arguments.get(redirectionPosition + 1));
-                            
-                            if (result.endsWith("\n")) {
-                                result = result.substring(0, result.length() - 1);
-                            }
-                            
-                            if (isStderr && (arguments.getFirst().equals("echo") || arguments.getFirst().equals("type") || arguments.getFirst().equals("cd"))) {
-                                Files.writeString(outputPath, "");
-                            } else {
-                                if (input.contains(">>")) {
-                                    if (Files.exists(outputPath) && Files.size(outputPath) > 0) {
-                                        Files.writeString(outputPath, "\n" + result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-                                    } else {
-                                        Files.writeString(outputPath, result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-                                    }
-                                } else {
-                                    Files.writeString(outputPath, result);
-                                }
-                            }
-                        }
+                    handleRedirection(input);
+                }
+            }
+        }
+    }
 
-                    } else {
-                        if (!handleCommand(input, isStderr).isEmpty()) {
-                            if (handleCommand(input, isStderr).endsWith("\n")) {
-                                System.out.print(handleCommand(input, isStderr));
-                            }
-                            else {
-                                System.out.println(handleCommand(input, isStderr));
-                            }
+    private static void handleRedirection(String input) throws Exception {
+        if (input.contains(">")) {
+            boolean isStderr = false;
+            List<String> arguments = parseArgumentsList(input);
+            int redirectionPosition = arguments.indexOf(">");
+            String[] operators = {"1>>", "2>>", ">>", "1>", "2>"};
+            for (String op : operators) {
+                if (input.contains(op)) {
+                    redirectionPosition = arguments.indexOf(op);
+                    isStderr = op.startsWith("2");
+                    break;
+                }
+            }
+            String result = handleCommand(String.join(" ", arguments.subList(0, redirectionPosition)), isStderr);
+            if (redirectionPosition < arguments.size() - 1) {
+                Path outputPath = Paths.get(arguments.get(redirectionPosition + 1));
+
+                if (result.endsWith("\n")) {
+                    result = result.substring(0, result.length() - 1);
+                }
+
+                if (isStderr && (arguments.getFirst().equals("echo") || arguments.getFirst().equals("type") || arguments.getFirst().equals("cd"))) {
+                    Files.writeString(outputPath, "");
+                } else {
+                    if (input.contains(">>")) {
+                        if (Files.exists(outputPath) && Files.size(outputPath) > 0) {
+                            Files.writeString(outputPath, "\n" + result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                        } else {
+                            Files.writeString(outputPath, result, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                         }
+                    } else {
+                        Files.writeString(outputPath, result);
                     }
+                }
+            }
+        } else {
+            if (!handleCommand(input).isEmpty()) {
+                if (handleCommand(input).endsWith("\n")) {
+                    System.out.print(handleCommand(input));
+                } else {
+                    System.out.println(handleCommand(input));
                 }
             }
         }
@@ -85,6 +87,10 @@ public class Main {
         } else {
             return handleExternalCommand(input, paths, isStderr);
         }
+    }
+
+    private static String handleCommand(String input) throws Exception {
+        return handleCommand(input, false);
     }
 
     private static boolean isExitCommand(String input) {
