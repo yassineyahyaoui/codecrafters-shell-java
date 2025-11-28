@@ -131,7 +131,7 @@ public class Main {
     }
 
     private static String handleType(String arguments, String[] paths) {
-        String[] allowedArguments = {"exit", "echo", "type", "pwd"};
+        String[] allowedArguments = {"exit", "echo", "type", "pwd", "history"};
 
         if (Arrays.asList(allowedArguments).contains(arguments)) {
             return arguments + " is a shell builtin";
