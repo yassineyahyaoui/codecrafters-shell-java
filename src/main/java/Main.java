@@ -74,20 +74,29 @@ public class Main {
 
     private static String handleCommand(String input, boolean isStderr) throws Exception {
         String[] paths = System.getenv("PATH").split(File.pathSeparator);
+        String firstArgument = input.split(" ")[0];
+
         if (input.equals("pwd")) {
             return path.toString();
-        } else if (input.split(" ")[0].equals("echo")) {
+
+        } else if (firstArgument.equals("echo")) {
             return handleEcho(input, isStderr);
-        } else if (input.split(" ")[0].equals("type")) {
+
+        } else if (firstArgument.equals("type")) {
             return handleType(input.substring(5), paths);
-        } else if (input.split(" ")[0].equals("history")) {
-            return handleHistory();
-        } else if (input.split(" ")[0].equals("cd")) {
+
+        } else if (firstArgument.equals("history")) {
+            if (input.split(" ").length == 1) return handleHistory();
+            else if (input.split(" ").length == 2) return handleHistory(Integer.parseInt(input.split(" ")[1]));
+            else return "history: too many arguments";
+
+        } else if (firstArgument.equals("cd")) {
             if (!handleCd(input.substring(3))) {
                 return "cd: " + input.substring(3) + ": No such file or directory";
             } else {
                 return "";
             }
+
         } else {
             return handleExternalCommand(input, paths, isStderr);
         }
@@ -134,14 +143,18 @@ public class Main {
         }
     }
 
-    private static String handleHistory() {
+    private static String handleHistory(int n) {
         StringBuilder res = new StringBuilder();
-
-        for (int i = 0; i < commandHistory.size(); i++) {
+        int start = 0;
+        if (n != 0) start = commandHistory.size() - n;
+        for (int i = start; i < commandHistory.size(); i++) {
             res.append("    ").append(i + 1).append("  ").append(commandHistory.get(i)).append("\n");
         }
-
         return res.substring(0, res.length() - 1);
+    }
+
+    private static String handleHistory() {
+        return handleHistory(0);
     }
 
     private static String handleType(String arguments, String[] paths) {
