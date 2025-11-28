@@ -8,6 +8,7 @@ import java.util.regex.*;
 
 public class Main {
     static Path path = Paths.get("").toAbsolutePath();
+    static List<String> commandHistory = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         try (Scanner scanner = new Scanner(System.in)) {
@@ -18,6 +19,7 @@ public class Main {
                 if (isExitCommand(input)) {
                     break;
                 } else {
+                    commandHistory.add(input);
                     handleRedirection(input);
                 }
             }
@@ -78,6 +80,8 @@ public class Main {
             return handleEcho(input, isStderr);
         } else if (input.split(" ")[0].equals("type")) {
             return handleType(input.substring(5), paths);
+        } else if (input.split(" ")[0].equals("history")) {
+            return handleHistory();
         } else if (input.split(" ")[0].equals("cd")) {
             if (!handleCd(input.substring(3))) {
                 return "cd: " + input.substring(3) + ": No such file or directory";
@@ -128,6 +132,16 @@ public class Main {
                 return true;
             }
         }
+    }
+
+    private static String handleHistory() {
+        StringBuilder res = new StringBuilder();
+
+        for (int i = 0; i < commandHistory.size(); i++) {
+            res.append("    ").append(i + 1).append("  ").append(commandHistory.get(i)).append("\n");
+        }
+
+        return res.substring(0, res.length() - 1);
     }
 
     private static String handleType(String arguments, String[] paths) {
