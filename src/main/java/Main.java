@@ -207,6 +207,29 @@ public class Main {
                 }
             }
         }
+
+        File file = new File(path.toString(), arguments.getFirst());
+        if (file.exists() && file.canExecute()) {
+            ProcessBuilder pb = new ProcessBuilder(arguments);
+            Process process = pb.start();
+
+            String stdout = new String(process.getInputStream().readAllBytes());
+
+            String stderr = new String(process.getErrorStream().readAllBytes());
+
+            if (!isStderr) {
+                if (!stderr.isEmpty()) {
+                    System.out.print(stderr);
+                }
+                return stdout;
+            } else {
+                if (!stdout.isEmpty()) {
+                    System.out.print(stdout);
+                }
+                return stderr;
+            }
+        }
+
         return arguments.getFirst() + ": command not found";
     }
 
