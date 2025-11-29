@@ -184,19 +184,14 @@ public class Main {
 
     private static String handleExternalCommand(String input, String[] paths, boolean isStderr) throws Exception {
         List<String> arguments = parseArgumentsList(input);
-        // Remove quotes from command name if present
-        String command = arguments.get(0);
-        if ((command.startsWith("'") && command.endsWith("'")) || (command.startsWith("\"") && command.endsWith("\""))) {
-            command = command.substring(1, command.length() - 1);
-        }
-        arguments.set(0, command);
         for (String path : paths) {
-            File file = new File(path, command);
+            File file = new File(path, arguments.getFirst());
             if (file.exists() && file.canExecute()) {
                 ProcessBuilder pb = new ProcessBuilder(arguments);
                 Process process = pb.start();
 
                 String stdout = new String(process.getInputStream().readAllBytes());
+
                 String stderr = new String(process.getErrorStream().readAllBytes());
 
                 if (!isStderr) {
@@ -212,7 +207,7 @@ public class Main {
                 }
             }
         }
-        return command + ": command not found";
+        return input.split(" ")[0] + ": command not found";
     }
 
     private static List<String> parseArgumentsList(String input) {
