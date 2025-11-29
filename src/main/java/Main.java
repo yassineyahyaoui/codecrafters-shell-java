@@ -220,16 +220,23 @@ public class Main {
 
         while (matcher.find()) {
             String word = matcher.group();
-            if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
+            
+            // Check if this is a double-quoted string
+            boolean isDoubleQuoted = word.startsWith("\"") && word.endsWith("\"");
+            boolean isSingleQuoted = word.startsWith("'") && word.endsWith("'");
+            
+            if (isDoubleQuoted || isSingleQuoted) {
+                // Remove the quotes
                 word = word.substring(1, word.length() - 1);
-            }
-
-            // Inside double quotes: only process \\ and \"
-            if (matcher.group(1) != null) {
-                word = word.replace("\\\"", "\"").replace("\\\\", "\\");
+                
+                // Inside double quotes: process \\ \" and \'
+                if (isDoubleQuoted) {
+                    word = word.replace("\\\"", "\"").replace("\\\\", "\\").replace("\\'", "'");
+                }
+                // Inside single quotes: no escape processing
             }
             // Outside quotes: process all backslash escapes
-            else if (matcher.group(2) == null) {
+            else {
                 word = word.replaceAll("\\\\(.)", "$1");
             }
 
