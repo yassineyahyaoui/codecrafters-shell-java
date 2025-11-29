@@ -174,7 +174,7 @@ public class Main {
         } else {
             for (String path : paths) {
                 File file = new File(path, arguments);
-                if (file.exists()) {
+                if (file.exists() && file.canExecute()) {
                     return arguments + " is " + file.getAbsolutePath();
                 }
             }
@@ -184,10 +184,9 @@ public class Main {
 
     private static String handleExternalCommand(String input, String[] paths, boolean isStderr) throws Exception {
         List<String> arguments = parseArgumentsList(input);
-        String commandName = arguments.getFirst();
         for (String path : paths) {
-            File file = new File(path, commandName);
-            if (file.exists()) {
+            File file = new File(path, arguments.getFirst());
+            if (file.exists() && file.canExecute()) {
                 ProcessBuilder pb = new ProcessBuilder(arguments);
                 Process process = pb.start();
 
@@ -208,7 +207,7 @@ public class Main {
                 }
             }
         }
-        return commandName + ": command not found";
+        return input.split(" ")[0] + ": command not found";
     }
 
     private static List<String> parseArgumentsList(String input) {
@@ -220,23 +219,16 @@ public class Main {
 
         while (matcher.find()) {
             String word = matcher.group();
-            
-            // Check if this is a double-quoted string
-            boolean isDoubleQuoted = word.startsWith("\"") && word.endsWith("\"");
-            boolean isSingleQuoted = word.startsWith("'") && word.endsWith("'");
-            
-            if (isDoubleQuoted || isSingleQuoted) {
-                // Remove the quotes
+            if ((word.startsWith("'") && word.endsWith("'")) || (word.startsWith("\"") && word.endsWith("\""))) {
                 word = word.substring(1, word.length() - 1);
-                
-                // Inside double quotes: process \\ \" and \'
-                if (isDoubleQuoted) {
-                    word = word.replace("\\\"", "\"").replace("\\\\", "\\").replace("\\'", "'");
-                }
-                // Inside single quotes: no escape processing
+            }
+
+            // Inside double quotes: only process \\ and \"
+            if (matcher.group(1) != null) {
+                word = word.replace("\\\"", "\"").replace("\\\\", "\\");
             }
             // Outside quotes: process all backslash escapes
-            else {
+            else if (matcher.group(2) == null) {
                 word = word.replaceAll("\\\\(.)", "$1");
             }
 
