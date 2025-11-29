@@ -18,7 +18,12 @@
     <dependencies>
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
+            <artifactId>jline-terminal</artifactId>
+            <version>3.30.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-reader</artifactId>
             <version>3.30.6</version>
         </dependency>
     </dependencies>
@@ -63,19 +68,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>Main</mainClass>
-                    <jvmArgs>
-                        <jvmArg>--enable-native-access=ALL-UNNAMED</jvmArg>
-                        <jvmArg>--add-opens</jvmArg>
-                        <jvmArg>java.base/java.io=ALL-UNNAMED</jvmArg>
-                    </jvmArgs>
-                </configuration>
             </plugin>
         </plugins>
     </build>

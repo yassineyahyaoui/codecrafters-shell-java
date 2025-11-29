@@ -5,22 +5,19 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.regex.*;
-
-// JLine imports
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
+import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
-import org.jline.reader.EndOfFileException;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 public class Main {
     static Path path = Paths.get("").toAbsolutePath();
     static List<String> commandHistory = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("org.jline.nativeloader.disabled", "true");
-        try (Terminal terminal = TerminalBuilder.builder().dumb(true).build()) {
+        try (Terminal terminal = TerminalBuilder.terminal()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
 
             while (true) {
