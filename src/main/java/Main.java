@@ -6,21 +6,32 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.regex.*;
 
+// JLine imports
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.EndOfFileException;
+
 public class Main {
     static Path path = Paths.get("").toAbsolutePath();
     static List<String> commandHistory = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (true) {
-                System.out.print("$ ");
-                String input = scanner.nextLine();
+        try (Terminal terminal = TerminalBuilder.terminal()) {
+            LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
 
-                if (isExitCommand(input)) {
-                    break;
-                } else {
+            while (true) {
+                try {
+                    String input = reader.readLine("$ ");
+                    if (isExitCommand(input)) break;
+
                     commandHistory.add(input);
                     handleRedirection(input);
+
+                } catch (UserInterruptException | EndOfFileException e) {
+                    break;
                 }
             }
         }
