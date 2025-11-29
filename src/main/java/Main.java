@@ -207,7 +207,7 @@ public class Main {
                 }
             }
         }
-        return input.split(" ")[0] + ": command not found";
+        return arguments.getFirst() + ": command not found";
     }
 
     private static List<String> parseArgumentsList(String input) {
