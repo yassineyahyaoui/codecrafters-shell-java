@@ -174,7 +174,7 @@ public class Main {
         } else {
             for (String path : paths) {
                 File file = new File(path, arguments);
-                if (file.exists() && file.canExecute()) {
+                if (file.exists()) {
                     return arguments + " is " + file.getAbsolutePath();
                 }
             }
@@ -187,7 +187,7 @@ public class Main {
         String commandName = arguments.getFirst();
         for (String path : paths) {
             File file = new File(path, commandName);
-            if (file.exists() && file.canExecute()) {
+            if (file.exists()) {
                 ProcessBuilder pb = new ProcessBuilder(arguments);
                 Process process = pb.start();
 
