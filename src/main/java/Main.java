@@ -19,7 +19,8 @@ public class Main {
     static List<String> commandHistory = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
-        try (Terminal terminal = TerminalBuilder.terminal()) {
+        System.setProperty("org.jline.nativeloader.disabled", "true");
+        try (Terminal terminal = TerminalBuilder.builder().dumb(true).build()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
 
             while (true) {
