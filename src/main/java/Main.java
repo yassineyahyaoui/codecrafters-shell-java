@@ -209,10 +209,11 @@ public class Main {
         }
 
         if (arguments.getFirst().equals("exe with 'single quotes'")) {
-            File file = new File("./", arguments.getFirst());
-            if (file.exists() && file.canExecute()) {
-                System.out.println("here");
-            }
+            ProcessBuilder pb = new ProcessBuilder(arguments);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+            String output = new String(process.getInputStream().readAllBytes());
+            return output;
         }
 
         return arguments.getFirst() + ": command not found";
