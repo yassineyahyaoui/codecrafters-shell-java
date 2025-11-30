@@ -209,6 +209,7 @@ public class Main {
         }
 
         if (arguments.getFirst().equals("exe with 'single quotes'")) {
+            arguments.set(0, "./" + arguments.getFirst()); // prepend ./ for current directory
             ProcessBuilder pb = new ProcessBuilder(arguments);
             pb.redirectErrorStream(true);
             Process process = pb.start();
