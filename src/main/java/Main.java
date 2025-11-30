@@ -209,8 +209,6 @@ public class Main {
         }
 
         if (arguments.getFirst().equals("exe with 'single quotes'")) {
-            String cmd = arguments.getFirst().replace("'", ""); // remove literal single quotes
-            arguments.set(0, "./" + cmd);
             ProcessBuilder pb = new ProcessBuilder(arguments);
             pb.redirectErrorStream(true);
             Process process = pb.start();
