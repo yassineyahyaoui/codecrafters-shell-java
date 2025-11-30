@@ -210,6 +210,7 @@ public class Main {
 
         File file = new File(path.toString(), "/" + arguments.getFirst());
         if (file.exists() && file.canExecute()) {
+            arguments.set(0, file.getAbsolutePath());
             ProcessBuilder pb = new ProcessBuilder(arguments);
             Process process = pb.start();
 
