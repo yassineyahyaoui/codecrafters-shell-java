@@ -209,7 +209,7 @@ public class Main {
         }
 
         if (arguments.getFirst().equals("exe with 'single quotes'")) {
-            File file = new File(path.toString(), arguments.getFirst());
+            File file = new File("./", arguments.getFirst());
             if (file.exists() && file.canExecute()) {
                 System.out.println("here");
             }
