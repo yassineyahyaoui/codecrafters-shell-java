@@ -208,7 +208,7 @@ public class Main {
             }
         }
 
-        if (input.equals("\"exe with 'single quotes'\"")) {
+        if (arguments.getFirst().equals("\"exe with 'single quotes'\"")) {
             System.out.println("here");
         }
 
